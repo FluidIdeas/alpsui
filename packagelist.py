@@ -61,3 +61,35 @@ class PackageList:
             return True
         else:
             return False
+
+    def clear_packages(self):
+        self.model.clear()
+
+    def append_package(self, package):
+        self.add_row([package['status'], package['name'], package['version'], package['available_version'], package['description']])
+    
+    def set_packages(self, packages, section=None, the_filter=None):
+        for package in packages:
+            if self.has_to_be_listed(package, section, the_filter):
+                self.append_package(package)
+
+    def has_to_be_listed(self, package, section=None, the_filter=None):
+        if the_filter == None and section == None:
+            return True
+        else:
+            is_in_section = False
+            if section == None:
+                is_in_section = True
+            elif package['section'] == section:
+                is_in_section = True
+
+            is_to_be_included = False
+            if the_filter == None:
+                is_to_be_included = True
+            elif the_filter == 1 and package['status'] == True:
+                is_to_be_included = True
+            elif the_filter == 2 and package['status'] == False:
+                is_to_be_included = True
+            elif the_filter == 3 and package['version'] != package['available_version'] and package['version'] != None:
+                is_to_be_included = True
+            return is_in_section and is_to_be_included
