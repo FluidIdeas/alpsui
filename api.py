@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-
 import os
 import json
+import threading
 import gi
 gi.require_version('Gtk', '3.0')
 
@@ -85,40 +84,29 @@ def get_sections(packages):
     sections.insert(0, 'All')
     return sections
 
-def create_menu_item(label, action_handler):
-	item = Gtk.MenuItem.new_with_mnemonic(label)
-	if action_handler != None:
-		item.connect('activate', action_handler)
-	return item
-
-def create_menu(label, item_labels, action_handlers):
-	menuitem = create_menu_item(label, None)
-	menu = Gtk.Menu()
-	for i in range(len(item_labels)):
-		if item_labels[i] == '':
-			item = Gtk.SeparatorMenuItem()
-		else:
-			item = create_menu_item(item_labels[i], action_handlers[i])
-		menu.append(item)
-	menuitem.set_submenu(menu)
-	return menuitem
-
-def create_main_menu():
-	menubar = Gtk.MenuBar()
-	menubar.append(create_menu('_Packages', ['_Update Scripts', '_Apply Changes', '', '_Install Updates', '', '_Exit'], [
-		do_nothing,
-		do_nothing,
-		None,
-        do_nothing,
-        None,
-		do_nothing]))
-	menubar.append(create_menu('_Settings', ['_Options'], [do_nothing]))
-	menubar.append(create_menu('_Help', ['_About'], [do_nothing]))
-	return menubar
-
-def do_nothing(a=None):
-    pass
-
 def execute(commands):
     process = subprocess.Popen(commands)
     process.communicate()
+
+def get_stats(packages):
+    total = 0
+    installed = 0
+    updates = 0
+    for package in packages:
+        total = total + 1
+        if package['status']:
+            installed = installed + 1
+        if package['version'] != None and package['version'] != package['available_version']:
+            updates = updates + 1
+    return (total, installed, updates)
+
+def daemon_thread(commands, statusbar, finalize_method):
+    process = subprocess.Popen(commands)
+    statusbar.pulse()
+    process.communicate()
+    statusbar.stop()
+    finalize_method()
+
+def start_daemon(commands, statusbar, finalize_method):
+    thread = threading.Thread(target=daemon_thread, args=(commands, statusbar, finalize_method))
+    thread.start()

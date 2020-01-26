@@ -10,6 +10,7 @@ from filters import Filters
 from menubar import AlpsUIMenuBar
 from searchbar import AlpsUISearchBar
 from toolbar import AlpsUIToolBar
+from statusbar import AlpsUIStatusBar
 import api
 
 class MainWindow(Gtk.Window):
@@ -24,18 +25,25 @@ class MainWindow(Gtk.Window):
 
     def init_components(self):
         self.packages = api.get_packages()
+        (total, installed, updates) = api.get_stats(self.packages)
         self.categories = api.get_sections(self.packages)
 
-        self.main_menu = AlpsUIMenuBar()
+        #self.main_menu = AlpsUIMenuBar()
         self.searchbar = AlpsUISearchBar()
         self.toolbar = AlpsUIToolBar(self.searchbar)
         self.toolbar_container = self.toolbar.layout()
         self.packagelist = PackageList(self)
         self.filters = Filters(self.on_filter)
         self.scrolledwindow = self.wrap_scrollbar(self.packagelist.list)
+        self.statusbar = AlpsUIStatusBar()
 
         self.category_list = Categories(self.categories, self.on_category_change)
         self.packagelist.set_packages(self.packages)
+        self.toolbar.init_statusbar(self.statusbar)
+
+        self.statusbar.set_status_text(0, total)
+        self.statusbar.set_status_text(1, installed)
+        self.statusbar.set_status_text(2, updates)
 
     def wrap_scrollbar(self, child):
         scrolledwindow = Gtk.ScrolledWindow()
@@ -54,9 +62,10 @@ class MainWindow(Gtk.Window):
         self.main_paned.add1(self.left_panel)
         self.main_paned.add2(self.right_paned)
         self.right_paned.add1(self.scrolledwindow)
-        self.parent_pane.pack_start(self.main_menu, False, False, 0)
+        #self.parent_pane.pack_start(self.main_menu, False, False, 0)
         self.parent_pane.pack_start(self.toolbar_container, False, False, 0)
         self.parent_pane.pack_start(self.main_paned, True, True, 0)
+        self.parent_pane.pack_start(self.statusbar, False, False, 0)
         self.add(self.parent_pane)
 
     def on_category_change(self, a, b):

@@ -1,3 +1,4 @@
+import api
 import gi
 gi.require_version('Gtk', '3.0')
 
@@ -11,13 +12,15 @@ class AlpsUIToolBar(Gtk.Toolbar):
 
     def init_components(self):
         self.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR)
-        refresh = self.create_tool_button('view-refresh', 'Update Scripts', self.refresh_clicked)
-        apply = self.create_tool_button('emblem-default', 'Apply Changes', self.apply_clicked)
-        install_updates = self.create_tool_button('system-software-update', 'Install Updates', self.install_updates_clicked)
+        self.refresh = self.create_tool_button('view-refresh', 'Update Scripts', self.refresh_clicked)
+        self.apply = self.create_tool_button('emblem-default', 'Apply Changes', self.apply_clicked)
+        self.install_updates = self.create_tool_button('system-software-update', 'Install Updates', self.install_updates_clicked)
+        self.settings = self.create_tool_button('emblem-system', 'Preferences', self.settings_clicked)
 
-        self.insert(refresh, 0)
-        self.insert(apply, 1)
-        self.insert(install_updates, 2)
+        self.insert(self.refresh, 0)
+        self.insert(self.apply, 1)
+        self.insert(self.install_updates, 2)
+        self.insert(self.settings, 3)
 
         self.set_hexpand(False)
         self.set_vexpand(False)
@@ -34,12 +37,21 @@ class AlpsUIToolBar(Gtk.Toolbar):
         btn.connect('clicked', target_function)
         return btn
 
+    def init_statusbar(self, statusbar):
+        self.statusbar = statusbar
+
     def refresh_clicked(self, source):
-        pass
+        self.refresh.set_sensitive(False)
+        api.start_daemon(['/usr/bin/alps', 'updatescripts'], self.statusbar,self.enable_refresh)
 
     def apply_clicked(self, source):
-        pass
+        self.statusbar.stop()
 
     def install_updates_clicked(self, source):
         pass
 
+    def settings_clicked(self, source):
+        pass
+
+    def enable_refresh(self):
+        self.refresh.set_sensitive(True)
