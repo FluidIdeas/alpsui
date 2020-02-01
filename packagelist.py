@@ -9,6 +9,7 @@ class PackageList:
         self.model = Gtk.ListStore(bool, str, str, str, str)
         self.list = Gtk.TreeView.new()
         self.list.set_model(self.model)
+        self.keywords = ''
 
         self.append_columns([
             self.create_bool_column('Installed', 0),
@@ -74,6 +75,16 @@ class PackageList:
                 self.append_package(package)
 
     def has_to_be_listed(self, package, section=None, the_filter=None):
+        if section == 'Search Results':
+            if self.keywords == '':
+                return False
+            words = self.keywords.split()
+            status = False
+            for word in words:
+                if word in package['name'] or (package['description'] != None and word in package['description']) or (package['version'] != None and word in package['version']):
+                    status = True
+                    break
+            return status
         if the_filter == None and section == None:
             return True
         else:
@@ -93,3 +104,6 @@ class PackageList:
             elif the_filter == 3 and package['version'] != package['available_version'] and package['version'] != None:
                 is_to_be_included = True
             return is_in_section and is_to_be_included
+
+    def set_search_text(self, keywords):
+        self.keywords = keywords

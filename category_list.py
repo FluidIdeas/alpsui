@@ -40,3 +40,6 @@ class Categories(Gtk.VBox):
 		if self.get_selection().get_index() == index:
 			self.on_selection(None, None)
 		self.categories.select_row(self.rows[index])
+
+	def select_search_results(self):
+		self.select_row(len(self.rows) - 1)

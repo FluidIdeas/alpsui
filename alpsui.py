@@ -41,6 +41,9 @@ class MainWindow(Gtk.Window):
         self.packagelist.set_packages(self.packages)
         self.toolbar.init_statusbar(self.statusbar)
 
+        self.searchbar.set_category_list(self.category_list)
+        self.searchbar.set_package_list(self.packagelist)
+
         self.statusbar.set_status_text(0, total)
         self.statusbar.set_status_text(1, installed)
         self.statusbar.set_status_text(2, updates)

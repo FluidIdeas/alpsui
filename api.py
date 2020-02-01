@@ -82,6 +82,7 @@ def get_sections(packages):
             sections.append(package['section'])
     sections.sort()
     sections.insert(0, 'All')
+    sections.append('Search Results')
     return sections
 
 def execute(commands):

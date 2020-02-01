@@ -29,4 +29,11 @@ class AlpsUISearchBar(Gtk.Grid):
         self.search_button.connect('clicked', self.on_search)
 
     def on_search(self, source):
-        pass
+        self.package_list.set_search_text(self.search_entry.get_text())
+        self.category_list.select_search_results()
+
+    def set_category_list(self, category_list):
+        self.category_list = category_list
+
+    def set_package_list(self, package_list):
+        self.package_list = package_list
