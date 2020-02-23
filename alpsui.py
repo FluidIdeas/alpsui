@@ -40,6 +40,7 @@ class MainWindow(Gtk.Window):
         self.category_list = Categories(self.categories, self.on_category_change)
         self.packagelist.set_packages(self.packages)
         self.toolbar.init_statusbar(self.statusbar)
+        self.toolbar.set_mainframe(self)
 
         self.searchbar.set_category_list(self.category_list)
         self.searchbar.set_package_list(self.packagelist)

@@ -3,6 +3,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, Gdk, GLib
+from shellwindow import ShellWindow
+import subprocess
 
 class AlpsUIToolBar(Gtk.Toolbar):
     def __init__(self, searchbar):
@@ -42,10 +44,14 @@ class AlpsUIToolBar(Gtk.Toolbar):
 
     def refresh_clicked(self, source):
         self.refresh.set_sensitive(False)
-        api.start_daemon(['/usr/bin/alps', 'updatescripts'], self.statusbar,self.enable_refresh)
+        api.start_daemon(['ping', 'www.google.com'], self.statusbar,self.enable_refresh)
 
     def apply_clicked(self, source):
-        self.statusbar.stop()
+        shell_win = ShellWindow('Installing packages...')
+        shell_win.set_mainframe(self.mainframe)
+        self.mainframe.hide()
+        shell_win.run_process('alps -ni install qt5'.split())
+        shell_win.show()
 
     def install_updates_clicked(self, source):
         pass
@@ -55,3 +61,6 @@ class AlpsUIToolBar(Gtk.Toolbar):
 
     def enable_refresh(self):
         self.refresh.set_sensitive(True)
+
+    def set_mainframe(self, mainframe):
+        self.mainframe = mainframe
