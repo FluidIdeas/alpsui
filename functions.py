@@ -44,11 +44,6 @@ def get_dependencies(package_name, processed = list()):
     dep_chain.append(package_name)
     return dep_chain
 
-def install(package_name):
-    conf = loadconfig()
-    # Run the script associated with the package
-    pass
-
 def get_download_urls(package_name):
     conf = loadconfig()
     filename = conf['SCRIPTS_DIR'] + package_name + '.sh'

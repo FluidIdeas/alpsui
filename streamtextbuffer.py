@@ -21,8 +21,6 @@ class StreamTextBuffer(Gtk.TextBuffer):
 			channel   = proc.stdout,
 			priority_ = GObject.IO_IN,
 			condition = self.buffer_update,
-			# func      = lambda *a: print("func") # when the condition is satisfied
-			# user_data = # user data to pass to func
 		)
 
 		self.unblock_fd(proc.stderr)
@@ -30,8 +28,6 @@ class StreamTextBuffer(Gtk.TextBuffer):
 			channel   = proc.stderr,
 			priority_ = GObject.IO_IN,
 			condition = self.buffer_update,
-			# func      = lambda *a: print("func") # when the condition is satisfied
-			# user_data = # user data to pass to func
 		)
 
 		self.IO_WATCH_ID = (watch_id_stdout, watch_id_stderr)
@@ -40,7 +36,7 @@ class StreamTextBuffer(Gtk.TextBuffer):
 	def buffer_update(self, stream, condition):
 		self.insert_at_cursor(stream.read().decode('utf-8'))
 		self.textview.scroll_to_mark(self.get_insert(), 0.0, True, 0.5, 0.5)
-		return True # otherwise isn't recalled
+		return True
 
 	def unblock_fd(self, stream):
 		fd = stream.fileno()

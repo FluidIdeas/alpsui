@@ -51,12 +51,8 @@ class AlpsUIToolBar(Gtk.Toolbar):
         shell_win = ShellWindow('Installing packages...')
         shell_win.set_mainframe(self.mainframe)
         self.mainframe.hide()
-        shell_win.run_install('mpg123')
-        #urls = functions.get_download_urls('qt5')
+        shell_win.run_install(['qt5'])
         shell_win.show()
-        #shell_win.download(urls, '/var/cache/alps/sources/')
-        #shell_win.run_process('alps -ni install qt5'.split())
-        #shell_win.show()
 
     def install_updates_clicked(self, source):
         pass

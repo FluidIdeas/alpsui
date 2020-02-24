@@ -28,7 +28,6 @@ class MainWindow(Gtk.Window):
         (total, installed, updates) = api.get_stats(self.packages)
         self.categories = api.get_sections(self.packages)
 
-        #self.main_menu = AlpsUIMenuBar()
         self.searchbar = AlpsUISearchBar()
         self.toolbar = AlpsUIToolBar(self.searchbar)
         self.toolbar_container = self.toolbar.layout()
@@ -66,7 +65,7 @@ class MainWindow(Gtk.Window):
         self.main_paned.add1(self.left_panel)
         self.main_paned.add2(self.right_paned)
         self.right_paned.add1(self.scrolledwindow)
-        #self.parent_pane.pack_start(self.main_menu, False, False, 0)
+
         self.parent_pane.pack_start(self.toolbar_container, False, False, 0)
         self.parent_pane.pack_start(self.main_paned, True, True, 0)
         self.parent_pane.pack_start(self.statusbar, False, False, 0)
