@@ -48,10 +48,28 @@ class AlpsUIToolBar(Gtk.Toolbar):
         api.start_daemon(['/usr/bin/alps', 'updatescripts'], self.statusbar,self.enable_refresh)
 
     def apply_clicked(self, source):
+        selections = self.searchbar.package_list.get_selections()
+        if (len(selections) == 0):
+            dialog = Gtk.Dialog("Nothing selected", self.mainframe, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
+            dialog.set_default_size(150, 60)
+            label = Gtk.Label("Please select an application to install.")
+            box = dialog.get_content_area()
+            box.add(label)
+            dialog.show_all()
+            dialog.run()
+            dialog.destroy()
+            return
+        install_list = list()
+        for selection in selections:
+            install_list.extend(functions.get_dependencies(selection))
+        final_list = list()
+        for item in install_list:
+            if item not in final_list and not functions.is_installed(item):
+                final_list.append(item)
         shell_win = ShellWindow('Installing packages...')
         shell_win.set_mainframe(self.mainframe)
         self.mainframe.hide()
-        shell_win.run_install(['qt5'])
+        shell_win.run_install(final_list)
         shell_win.show()
 
     def install_updates_clicked(self, source):

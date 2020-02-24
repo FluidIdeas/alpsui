@@ -56,3 +56,12 @@ def get_download_urls(package_name):
             url = parts[len(parts) - 1]
             download_urls.append(url)
     return download_urls
+
+def is_installed(package_name):
+    conf = loadconfig()
+    with open(conf['INSTALLED_LIST'], 'r') as fp:
+        lines = fp.readlines()
+    for line in lines:
+        if package_name + '=>' in line and line.index(package_name + '=>') == 0:
+            return True
+    return False

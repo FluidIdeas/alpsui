@@ -15,12 +15,16 @@ class InstallerThread(threading.Thread):
         self.script_process  = None
 
     def terminate(self):
+        self.run_thread = False
         os.killpg(os.getpgid(self.script_process.pid), signal.SIGTERM)
 
     def run(self):
         for package_name in self.package_names:
+            if self.run_thread == False:
+                return
             self.script_process = subprocess.Popen(['/var/cache/alps/scripts/' + package_name + '.sh'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 preexec_fn=os.setsid)
             self.text_buffer.bind_subprocess(self.script_process)
+            self.script_process.wait()
