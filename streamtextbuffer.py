@@ -15,7 +15,6 @@ class StreamTextBuffer(Gtk.TextBuffer):
 		Gtk.TextBuffer.__init__(self)
 		self.IO_WATCH_ID = tuple()
 
-
 	def bind_subprocess(self, proc):
 		self.unblock_fd(proc.stdout)
 		watch_id_stdout = GObject.io_add_watch(
@@ -38,9 +37,9 @@ class StreamTextBuffer(Gtk.TextBuffer):
 		self.IO_WATCH_ID = (watch_id_stdout, watch_id_stderr)
 		return self.IO_WATCH_ID
 
-
 	def buffer_update(self, stream, condition):
 		self.insert_at_cursor(stream.read().decode('utf-8'))
+		self.textview.scroll_to_mark(self.get_insert(), 0.0, True, 0.5, 0.5)
 		return True # otherwise isn't recalled
 
 	def unblock_fd(self, stream):
@@ -48,3 +47,5 @@ class StreamTextBuffer(Gtk.TextBuffer):
 		fl = fcntl.fcntl(fd, fcntl.F_GETFL)
 		fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
+	def set_textview(self, textview):
+		self.textview = textview

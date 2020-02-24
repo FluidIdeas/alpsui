@@ -7,10 +7,15 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, Gdk, GLib, Gio
 from streamtextbuffer import StreamTextBuffer
+from downloader import Downloader
+from installerthread import InstallerThread
+import functions
+import time
 
 class ShellWindow(Gtk.Window):
     def __init__(self, title):
         Gtk.Window.__init__(self, title=title)
+        self.threads = list()
         self.init_components()
         self.add_components()
     
@@ -20,10 +25,12 @@ class ShellWindow(Gtk.Window):
         self.log_text_area = Gtk.TextView()
         self.scrolled_window.add(self.log_text_area)
         self.buffer = StreamTextBuffer()
+        self.buffer.set_textview(self.log_text_area)
         self.log_text_area.set_buffer(self.buffer)
         self.close_button = Gtk.Button('Close')
         self.close_button.connect('clicked', self.on_close)
         self.log_text_area.set_sensitive(False)
+        self.subprocess = None
 
     def add_components(self):
         self.add(self.root_panel)
@@ -31,19 +38,35 @@ class ShellWindow(Gtk.Window):
         self.root_panel.pack_start(self.close_button, False, False, 0)
         self.close_button.set_hexpand(False)
 
-    def run_process(self, commands):
-        self.subprocess = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    def run_install(self, package):
+        self.buffer.insert_at_cursor('Downloading sources...\n')
+        self.threads = list()
+        installer = InstallerThread('wireless_tools', self.buffer)
+        self.threads.append(installer)
+        installer.start()
+
+    def start_script(self, package):
+        self.subprocess = subprocess.Popen(['/var/cache/alps/scripts/' + package + '.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.buffer.bind_subprocess(self.subprocess)
 
+    def downloads_completed(self, threads):
+        for t in threads:
+            if t.isAlive():
+                return False
+        return True
+
+    def run_process(self, commands):
+        pass
+
     def on_close(self, source):
-        returncode = self.subprocess.poll()
-        if returncode == None:
-            response = self.prompt("Are you sure you want to Close?", "If you cancel the installation before it is complete, the system may end up in an unusable state.")
-            self.prompt_dialog.destroy()
-            if response == Gtk.ResponseType.OK:
-                self.subprocess.send_signal(signal.SIGINT)
-                self.destroy()
-                self.mainframe.show_all()
+        response = self.prompt("Are you sure you want to Close?", "If you cancel the installation before it is complete, the system may end up in an unusable state.")
+        self.prompt_dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            print('Killing threads')
+            for t in self.threads:
+                t.terminate()
+            self.destroy()
+            self.mainframe.show_all()
         else:
             self.destroy()
             self.mainframe.show_all()
@@ -66,3 +89,6 @@ class ShellWindow(Gtk.Window):
         dialog.show_all()
         self.prompt_dialog = dialog
         return dialog.run()
+
+    def download(self, urls, download_dir):
+        pass

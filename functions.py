@@ -46,6 +46,18 @@ def get_dependencies(package_name, processed = list()):
 
 def install(package_name):
     conf = loadconfig()
-    
     # Run the script associated with the package
+    pass
 
+def get_download_urls(package_name):
+    conf = loadconfig()
+    filename = conf['SCRIPTS_DIR'] + package_name + '.sh'
+    with open(filename) as fp:
+        lines = fp.readlines()
+    download_urls = list()
+    for line in lines:
+        if 'wget' in line and line.index('wget') == 0:
+            parts = line.split()
+            url = parts[len(parts) - 1]
+            download_urls.append(url)
+    return download_urls
