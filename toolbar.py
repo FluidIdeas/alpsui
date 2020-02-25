@@ -48,8 +48,8 @@ class AlpsUIToolBar(Gtk.Toolbar):
         api.start_daemon(['/usr/bin/alps', 'updatescripts'], self.statusbar,self.enable_refresh)
 
     def apply_clicked(self, source):
-        selections = self.searchbar.package_list.get_selections()
-        if (len(selections) == 0):
+        self.selections = self.searchbar.package_list.get_selections()
+        if (len(self.selections) == 0):
             dialog = Gtk.Dialog("Nothing selected", self.mainframe, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
             dialog.set_default_size(-1, -1)
             label = Gtk.Label("Please select an application to install.")
@@ -60,12 +60,17 @@ class AlpsUIToolBar(Gtk.Toolbar):
             dialog.destroy()
             return
         install_list = list()
-        for selection in selections:
-            install_list.extend(functions.get_dependencies(selection))
+        for selection in self.selections:
+            deps = functions.get_dependencies(selection, list())
+            install_list.extend(deps)
         final_list = list()
         for item in install_list:
             if item not in final_list and not functions.is_installed(item):
                 final_list.append(item)
+        s = ', '.join(final_list)
+        response = self.show_message(' install these packages: ' + s)
+        if response == Gtk.ResponseType.NO:
+            return
         shell_win = ShellWindow('Installing packages...')
         shell_win.set_mainframe(self.mainframe)
         self.mainframe.hide()
@@ -83,3 +88,11 @@ class AlpsUIToolBar(Gtk.Toolbar):
 
     def set_mainframe(self, mainframe):
         self.mainframe = mainframe
+
+    def show_message(self, message):
+        dialog = Gtk.MessageDialog(
+            self.mainframe, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
+            'Are you sure you want to ' + message)
+        response = dialog.run()
+        dialog.destroy()
+        return response

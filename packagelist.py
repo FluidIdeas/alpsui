@@ -46,8 +46,6 @@ class PackageList:
                 self.model[it][0] = not self.model[it][0]
 
     def confirm_change(self, name, status, origin_status):
-        print(status)
-        print(origin_status)
         if not status:
             if not origin_status:
                 msg = 'install ' + name + ' and all its dependencies?'
@@ -64,7 +62,8 @@ class PackageList:
             self.selections.append(name)
             return True
         else:
-            self.selections.remove(name)
+            if name in self.selections:
+                self.selections.remove(name)
             return False
 
     def clear_packages(self):

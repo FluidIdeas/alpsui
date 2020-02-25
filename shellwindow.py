@@ -45,15 +45,20 @@ class ShellWindow(Gtk.Window):
         installer.start()
 
     def on_close(self, source):
-        response = self.prompt("Are you sure you want to Close?", "If you cancel the installation before it is complete, the system may end up in an unusable state.")
-        self.prompt_dialog.destroy()
-        if response == Gtk.ResponseType.OK:
-            for t in self.threads:
-                t.terminate()
-            self.destroy()
-            self.mainframe.show_all()
+        if (self.threads[0].isAlive()):
+            response = self.prompt("Are you sure you want to Close?", "If you cancel the installation before it is complete, the system may end up in an unusable state.")
+            self.prompt_dialog.destroy()
+            if response == Gtk.ResponseType.OK:
+                for t in self.threads:
+                    t.terminate()
+                self.destroy()
+                self.mainframe.refresh()
+                self.mainframe.packagelist.selections = list()
+                self.mainframe.show_all()
         else:
             self.destroy()
+            self.mainframe.refresh()
+            self.mainframe.packagelist.selections = list()
             self.mainframe.show_all()
 
     def show(self):

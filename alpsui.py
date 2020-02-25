@@ -48,6 +48,13 @@ class MainWindow(Gtk.Window):
         self.statusbar.set_status_text(1, installed)
         self.statusbar.set_status_text(2, updates)
 
+    def refresh(self):
+        self.packages = api.get_packages()
+        (total, installed, updates) = api.get_stats(self.packages)
+        self.categories = api.get_sections(self.packages)
+        self.packagelist.set_packages(self.packages)
+        self.category_list.select_row(0)
+
     def wrap_scrollbar(self, child):
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_hexpand(True)
