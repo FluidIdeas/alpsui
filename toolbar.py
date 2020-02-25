@@ -51,7 +51,7 @@ class AlpsUIToolBar(Gtk.Toolbar):
         selections = self.searchbar.package_list.get_selections()
         if (len(selections) == 0):
             dialog = Gtk.Dialog("Nothing selected", self.mainframe, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
-            dialog.set_default_size(150, 60)
+            dialog.set_default_size(-1, -1)
             label = Gtk.Label("Please select an application to install.")
             box = dialog.get_content_area()
             box.add(label)

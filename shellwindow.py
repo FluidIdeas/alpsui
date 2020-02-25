@@ -21,6 +21,7 @@ class ShellWindow(Gtk.Window):
     def init_components(self):
         self.root_panel = Gtk.VBox()
         self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(Gtk.PolicyType.ALWAYS, Gtk.PolicyType.AUTOMATIC)
         self.log_text_area = Gtk.TextView()
         self.scrolled_window.add(self.log_text_area)
         self.buffer = StreamTextBuffer()
@@ -67,7 +68,7 @@ class ShellWindow(Gtk.Window):
 
     def prompt(self, heading, message):
         dialog = Gtk.Dialog(heading, self.mainframe, 0, (Gtk.STOCK_YES, Gtk.ResponseType.OK, Gtk.STOCK_NO, Gtk.ResponseType.CANCEL))
-        dialog.set_default_size(150, 100)
+        dialog.set_default_size(-1, -1)
         label = Gtk.Label(message)
         dialog.get_content_area().add(label)
         dialog.show_all()

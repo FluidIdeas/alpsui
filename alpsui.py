@@ -3,7 +3,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from packagelist import PackageList
 from category_list  import Categories
 from filters import Filters
