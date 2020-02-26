@@ -45,3 +45,7 @@ class StreamTextBuffer(Gtk.TextBuffer):
 
 	def set_textview(self, textview):
 		self.textview = textview
+
+	def append_text(self, text):
+		self.insert_at_cursor(text)
+		self.textview.scroll_to_mark(self.get_insert(), 0.0, True, 0.5, 0.5)

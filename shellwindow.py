@@ -8,6 +8,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Gio
 from streamtextbuffer import StreamTextBuffer
 from installerthread import InstallerThread
+from updaterthread import UpdaterThread
 import functions
 import time
 
@@ -44,9 +45,15 @@ class ShellWindow(Gtk.Window):
         self.threads.append(installer)
         installer.start()
 
+    def run_update(self, url):
+        self.threads = list()
+        updater = UpdaterThread(url, self.buffer)
+        self.threads.append(updater)
+        updater.start()
+
     def on_close(self, source):
         if (self.threads[0].isAlive()):
-            response = self.prompt("Are you sure you want to Close?", "If you cancel the installation before it is complete, the system may end up in an unusable state.")
+            response = self.prompt("Are you sure you want to Close?", "If you cancel, the system may end up in an unusable state.")
             self.prompt_dialog.destroy()
             if response == Gtk.ResponseType.OK:
                 for t in self.threads:

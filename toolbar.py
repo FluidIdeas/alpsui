@@ -68,7 +68,7 @@ class AlpsUIToolBar(Gtk.Toolbar):
             if item not in final_list and not functions.is_installed(item):
                 final_list.append(item)
         s = ', '.join(final_list)
-        response = self.show_message(' install these packages: ' + s)
+        response = self.ask_question(' install these packages: ' + s)
         if response == Gtk.ResponseType.NO:
             return
         shell_win = ShellWindow('Installing packages...')
@@ -78,7 +78,24 @@ class AlpsUIToolBar(Gtk.Toolbar):
         shell_win.show()
 
     def install_updates_clicked(self, source):
-        pass
+        source = functions.get_installation_source()
+        latest_version = functions.get_latest_aryalinux_version()
+        current_version = functions.get_aryalinux_version()
+        if latest_version not in source:
+            latest_source = source.replace(current_version, latest_version)
+            if '-min-' in latest_source:
+                latest_source_url = 'https://sourceforge.net/projects/aryalinux/files/releases/' + latest_version + '/min/' + latest_source
+            else:
+                latest_source_url = 'https://sourceforge.net/projects/aryalinux/files/releases/' + latest_version + '/' + latest_source
+            response = self.ask_question('download and install updates. This would take a while depending on the download speed. Current version: ' + current_version + ', Latest Version: ' + latest_version)
+            if response == Gtk.ResponseType.YES:
+                shell_win = ShellWindow('Downloading and installing updates...')
+                shell_win.set_mainframe(self.mainframe)
+                self.mainframe.hide()
+                shell_win.run_update(latest_source_url)
+                shell_win.show()
+        else:
+            self.show_message('Update Status', 'System already up to date.')
 
     def settings_clicked(self, source):
         pass
@@ -89,10 +106,20 @@ class AlpsUIToolBar(Gtk.Toolbar):
     def set_mainframe(self, mainframe):
         self.mainframe = mainframe
 
-    def show_message(self, message):
+    def ask_question(self, message):
         dialog = Gtk.MessageDialog(
             self.mainframe, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
             'Are you sure you want to ' + message)
         response = dialog.run()
         dialog.destroy()
         return response
+
+    def show_message(self, title, message):
+        dialog = Gtk.Dialog(title, self.mainframe, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        dialog.set_default_size(-1, -1)
+        label = Gtk.Label(message)
+        box = dialog.get_content_area()
+        box.add(label)
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()

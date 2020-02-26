@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import requests
+from bs4 import BeautifulSoup
+import subprocess
+import os
 
 def append_unique(lst, item):
     if item not in lst:
@@ -65,3 +68,61 @@ def is_installed(package_name):
         if package_name + '=>' in line and line.index(package_name + '=>') == 0:
             return True
     return False
+
+def get_latest_aryalinux_version():
+    p = subprocess.Popen('/usr/bin/curl -q https://sourceforge.net/projects/aryalinux/files/releases/', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    (out, err) = p.communicate()
+    doc = BeautifulSoup(out, features='lxml')
+    rows = doc.select('table#files_list tbody tr')
+    versions = list()
+    for row in rows:
+        row_title = row.attrs['title']
+        if row_title not in ['2015', '2016.04', '2016.08', '2017', '2017.08', '1.0']:
+            versions.append(row_title)
+    versions.sort()
+    return versions[len(versions) - 1]
+
+def get_aryalinux_version():
+    with open('/etc/lsb-release', 'r') as fp:
+        lines = fp.readlines()
+    version = None
+    for line in lines:
+        if 'DISTRIB_RELEASE=' in line and line.index('DISTRIB_RELEASE=') == 0:
+            version = line.replace('DISTRIB_RELEASE=', '').replace('"', '').strip()
+            break
+    return version
+
+def get_installation_source():
+    if os.path.exists('/etc/alps/install-source'):
+        with open('/etc/alps/install-source') as fp:
+            lines = fp.readlines()
+        source = lines[0].strip()
+        return source
+    else:
+        with open('/etc/alps/installed-list') as fp:
+            lines = fp.readlines()
+        xserver = False
+        de = None
+        libreoffice = False
+        for line in lines:
+            if 'xserver-meta' in line and line.index('xserver-meta') == 0:
+                xserver = True
+                break
+        if xserver:
+            for line in lines:
+                if 'desktop-environment' in  line:
+                    de = line.split('=')[0].strip().replace('-desktop-environment', '')
+                    break
+        if de == 'kde':
+            de = 'kde5'
+        if de != None:
+            for line in lines:
+                if 'libreoffice' in line and line.index('libreoffice') == 0:
+                    libreoffice = True
+        source = 'aryalinux-'
+        if xserver and de != None and libreoffice:
+            source = source + get_aryalinux_version() + '-' + de + '-x86_64.iso'
+        elif xserver and de != None and not libreoffice:
+            source = source + get_aryalinux_version() + '-' + de + '-slim-x86_64.iso'
+        return source
+
