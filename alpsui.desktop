@@ -6,7 +6,7 @@ GenericName=Package manager
 Exec=/usr/bin/alpsui.py
 Terminal=false
 Type=Application
-Icon=application-x-executable
+Icon=package-x-generic-symbolic
 Categories=GNOME;System;
 StartupNotify=true
 
