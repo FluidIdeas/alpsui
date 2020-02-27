@@ -45,21 +45,15 @@ sys
 tmp
 "
 
-for f in $(find $workdir | sed "s@$workdir/@@g"); do
-    for x in $(echo $root_no_overwrite); do
-        if [ "x$x" != "x$f" ]; then
-            for y in $(echo $etc_no_overwrite); do
-                if [ "xetc/$y" != "x$f" ]
-                    sudo cp -prvf $workdir/$f /
-                else
-                    echo "Skipped $f"
-                fi
-            done
-        else
-            echo "Skipped dir $f"
-        fi
-    done
+for d in $(echo $root_no_overwrite); do
+    sudo rm -rf $workdir/$d
 done
+
+for f in $(echo $etc_no_overwrite); do
+    sudo rm -rf $workdir/etc/$f
+done
+
+sudo cp -prvf $workdir/* /
 
 sudo update-desktop-database
 sudo update-mime-database /usr/share/mime

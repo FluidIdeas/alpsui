@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=ALPS Package Manager
+Comment=AryaLinux package manager
+GenericName=Package manager
+Exec=/usr/bin/alpsui.py
+Terminal=false
+Type=Application
+Icon=application-x-executable
+Categories=GNOME;System;
+StartupNotify=true
+
