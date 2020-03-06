@@ -66,8 +66,11 @@ def get_packages():
     package_dict = dict()
     packages = list()
     names = list()
+    versions = get_versions()
     for script in scripts:
         package = parse_package(script)
+        if package['name'] in versions:
+            package['version'] = versions[package['name']]
         package_dict[package['name']] = package
         names.append(package['name'])
     names.sort()
@@ -111,3 +114,21 @@ def daemon_thread(commands, statusbar, finalize_method):
 def start_daemon(commands, statusbar, finalize_method):
     thread = threading.Thread(target=daemon_thread, args=(commands, statusbar, finalize_method))
     thread.start()
+
+def get_versions():
+    config = get_config()
+    versions_file = config['VERSION_LIST']
+    with open(versions_file) as fp:
+        lines = fp.readlines()
+    versions = dict()
+    for line in lines:
+        parts = line.split(':')
+        versions[parts[0]] = parts[1].strip()
+    return versions
+
+def write_versions(versions):
+    config = get_config()
+    versions_file = config['VERSION_LIST']
+    with open(versions_file, 'w') as fp:
+        for name, version in versions.items():
+            fp.write(name + ':' + version)
