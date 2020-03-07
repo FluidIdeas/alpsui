@@ -45,9 +45,9 @@ class ShellWindow(Gtk.Window):
         self.threads.append(installer)
         installer.start()
 
-    def run_update(self, url):
+    def run_update(self, packages):
         self.threads = list()
-        updater = UpdaterThread(url, self.buffer)
+        updater = UpdaterThread(packages, self.buffer)
         self.threads.append(updater)
         updater.start()
 

@@ -82,7 +82,6 @@ class AlpsUIToolBar(Gtk.Toolbar):
         updateable = list()
         for package in self.packages:
             if package['version'] != None and package['version'] != package['available_version']:
-                print(package)
                 if package['name'] not in updateable:
                     updateable.append(package['name'])
         if len(updateable) == 0:
@@ -95,7 +94,7 @@ class AlpsUIToolBar(Gtk.Toolbar):
             shell_win = ShellWindow('Installing updates...')
             shell_win.set_mainframe(self.mainframe)
             self.mainframe.hide()
-            shell_win.run_install(updateable)
+            shell_win.run_update(updateable)
             shell_win.show()
 
     def settings_clicked(self, source):

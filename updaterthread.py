@@ -29,6 +29,15 @@ class UpdaterThread(threading.Thread):
                 preexec_fn=os.setsid)
             self.text_buffer.bind_subprocess(self.script_process)
             self.script_process.wait()
-            versions = api.get_versions()
-            api.write_versions(versions)
+            cmds = 'sudo python3 version_updater.py'
+            proc = subprocess.Popen(cmds, shell=True)
+            proc.communicate()
         self.text_buffer.append_text('\n\nUpdates Installed successfully.')
+
+    def get_version_from_file(self, script_path):
+        version = None
+        with open(script_path) as fp:
+            line = fp.readline()
+            if 'VERSION=' in line and line.index('VERSION=') == 0:
+                version = line.split('=')[1].strip().replace('"', '')
+        return version

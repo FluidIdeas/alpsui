@@ -24,7 +24,8 @@ def parse_package(script_path):
     with open(config['VERSION_LIST'], 'r') as fp:
         lines = fp.readlines()
     for line in lines:
-        versions[line.split(':')[0]] = line.split(':')[1].strip()
+        if ':' in line:
+            versions[line.split(':')[0]] = line.split(':')[1].strip()
     with open(config['SCRIPTS_DIR'] + '/' + script_path, 'r') as fp:
         lines = fp.readlines()
     deps = list()
@@ -122,8 +123,9 @@ def get_versions():
         lines = fp.readlines()
     versions = dict()
     for line in lines:
-        parts = line.split(':')
-        versions[parts[0]] = parts[1].strip()
+        if ':' in line:
+            parts = line.split(':')
+            versions[parts[0]] = parts[1].strip()
     return versions
 
 def write_versions(versions):
